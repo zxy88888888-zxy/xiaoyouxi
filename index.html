@@ -8,111 +8,73 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
     <title>井字棋游戏</title>
     <style>
-      body {
-        background: linear-gradient(135deg, #000000, #434343);
-        color: white;
-        font-family: 'Roboto', sans-serif;
-      }
-
-      #board {
-        display: grid;
-        grid-template-columns: repeat(3, 100px);
-        gap: 10px;
-        margin: 20px auto;
-        justify-content: center;
-      }
-
-     .cell {
-        width: 100px;
-        height: 100px;
-        background-color: rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 64px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-      }
-
-     .cell:hover {
-        background-color: rgba(255, 255, 255, 0.2);
-      }
-
-      #status {
-        text-align: center;
-        font-size: 24px;
-        margin-bottom: 20px;
-      }
-
-     .modal {
-        display: none;
-        position: fixed;
-        z-index: 1;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0, 0, 0, 0.4);
-        justify-content: center;
-        align-items: center;
-      }
-
-     .modal-content {
-        background-color: #fefefe;
-        padding: 20px;
-        border-radius: 10px;
-        width: 300px;
-        text-align: center;
-        animation: fadeIn 0.3s ease;
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: scale(0.8);
+        body {
+            background: linear-gradient(135deg, #000000, #434343);
+            color: white;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
         }
-        to {
-          opacity: 1;
-          transform: scale(1);
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            gap: 10px;
+            margin: 20px auto;
         }
-      }
 
-     .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-      }
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-     .close:hover,
-     .close:focus {
-        color: black;
-        text-decoration: none;
-      }
+        .cell:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
 
-      img {
-        display: block;
-        margin: 20px auto;
-        border-radius: 10px;
-      }
+        #status {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
 
-     .restart-btn {
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        margin-top: 10px;
-        transition: background-color 0.3s ease;
-      }
+        #result {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
 
-     .restart-btn:hover {
-        background-color: #0056b3;
-      }
+        #restart-button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #restart-button:hover {
+            background-color: #0056b3;
+        }
+
+        img {
+            display: block;
+            margin: 20px auto;
+            border-radius: 10px;
+        }
     </style>
 </head>
 
@@ -122,20 +84,13 @@
         <!-- 这里会通过 JavaScript 动态创建井字棋的单元格 -->
     </div>
     <p id="status" class="text-lg mt-4"></p>
+    <p id="result"></p>
+    <button id="restart-button" style="display: none;">再来一局</button>
     <img src="@/https___zxy88888888-zxy.github.io_xiaoyouxi_.png" alt="网站二维码" class="mt-8 w-48">
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <p id="modal-message"></p>
-            <button class="restart-btn" id="restart-button">再开一局</button>
-        </div>
-    </div>
     <script>
         const board = document.getElementById('board');
         const status = document.getElementById('status');
-        const modal = document.getElementById('myModal');
-        const modalMessage = document.getElementById('modal-message');
-        const closeBtn = document.querySelector('.close');
+        const result = document.getElementById('result');
         const restartButton = document.getElementById('restart-button');
         let currentPlayer = 'X';
         let gameBoard = ['', '', '', '', '', '', '', '', ''];
@@ -159,11 +114,11 @@
                 event.target.style.color = currentPlayer === 'X'? 'black' : 'white';
                 if (checkWin(currentPlayer)) {
                     const winMessage = `${currentPlayer} 获胜！`;
-                    showModal(winMessage);
+                    showResult(winMessage);
                     gameActive = false;
                 } else if (gameBoard.every(cell => cell!== '')) {
                     const drawMessage = '平局！';
-                    showModal(drawMessage);
+                    showResult(drawMessage);
                     gameActive = false;
                 } else {
                     currentPlayer = currentPlayer === 'X'? 'O' : 'X';
@@ -183,10 +138,9 @@
             });
         }
 
-        function showModal(message) {
-            console.log('Showing modal with message:', message);
-            modalMessage.textContent = message;
-            modal.style.display = 'flex';
+        function showResult(message) {
+            result.textContent = message;
+            restartButton.style.display = 'block';
         }
 
         function restartGame() {
@@ -194,22 +148,13 @@
             gameBoard = ['', '', '', '', '', '', '', '', ''];
             gameActive = true;
             status.textContent = `${currentPlayer} 的回合`;
+            result.textContent = '';
+            restartButton.style.display = 'none';
             const cells = document.querySelectorAll('.cell');
             cells.forEach(cell => {
                 cell.textContent = '';
             });
-            modal.style.display = 'none';
         }
-
-        closeBtn.addEventListener('click', function () {
-            modal.style.display = 'none';
-        });
-
-        window.addEventListener('click', function (event) {
-            if (event.target === modal) {
-                modal.style.display = 'none';
-            }
-        });
 
         restartButton.addEventListener('click', restartGame);
 
