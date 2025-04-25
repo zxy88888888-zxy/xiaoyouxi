@@ -98,6 +98,21 @@
         margin: 20px auto;
         border-radius: 10px;
       }
+
+     .restart-btn {
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: background-color 0.3s ease;
+      }
+
+     .restart-btn:hover {
+        background-color: #0056b3;
+      }
     </style>
 </head>
 
@@ -112,6 +127,7 @@
         <div class="modal-content">
             <span class="close">&times;</span>
             <p id="modal-message"></p>
+            <button class="restart-btn" id="restart-button">再开一局</button>
         </div>
     </div>
     <script>
@@ -120,6 +136,7 @@
         const modal = document.getElementById('myModal');
         const modalMessage = document.getElementById('modal-message');
         const closeBtn = document.querySelector('.close');
+        const restartButton = document.getElementById('restart-button');
         let currentPlayer = 'X';
         let gameBoard = ['', '', '', '', '', '', '', '', ''];
         let gameActive = true;
@@ -142,12 +159,10 @@
                 event.target.style.color = currentPlayer === 'X'? 'black' : 'white';
                 if (checkWin(currentPlayer)) {
                     const winMessage = `${currentPlayer} 获胜！`;
-                    console.log('Win message:', winMessage); // 调试信息
                     showModal(winMessage);
                     gameActive = false;
                 } else if (gameBoard.every(cell => cell!== '')) {
                     const drawMessage = '平局！';
-                    console.log('Draw message:', drawMessage); // 调试信息
                     showModal(drawMessage);
                     gameActive = false;
                 } else {
@@ -169,9 +184,21 @@
         }
 
         function showModal(message) {
-            console.log('Showing modal with message:', message); // 调试信息
+            console.log('Showing modal with message:', message);
             modalMessage.textContent = message;
             modal.style.display = 'flex';
+        }
+
+        function restartGame() {
+            currentPlayer = 'X';
+            gameBoard = ['', '', '', '', '', '', '', '', ''];
+            gameActive = true;
+            status.textContent = `${currentPlayer} 的回合`;
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                cell.textContent = '';
+            });
+            modal.style.display = 'none';
         }
 
         closeBtn.addEventListener('click', function () {
@@ -183,6 +210,8 @@
                 modal.style.display = 'none';
             }
         });
+
+        restartButton.addEventListener('click', restartGame);
 
         createBoard();
         status.textContent = `${currentPlayer} 的回合`;
