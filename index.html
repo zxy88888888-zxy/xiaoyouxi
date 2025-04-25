@@ -1,11 +1,193 @@
-# xiaoyouxi
-<html>
-  <head>
-    <title>小游戏</title>
-    <meta charset='utf-8'>
-  </head>
-  <body>
-    <h1>我的小游戏</h1>
-    <img src="https___zxy88888888-zxy.github.io_xiaoyouxi_.png">
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <title>井字棋游戏</title>
+    <style>
+      body {
+        background: linear-gradient(135deg, #000000, #434343);
+        color: white;
+        font-family: 'Roboto', sans-serif;
+      }
+
+      #board {
+        display: grid;
+        grid-template-columns: repeat(3, 100px);
+        gap: 10px;
+        margin: 20px auto;
+        justify-content: center;
+      }
+
+     .cell {
+        width: 100px;
+        height: 100px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 64px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+     .cell:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+      }
+
+      #status {
+        text-align: center;
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+
+     .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+        justify-content: center;
+        align-items: center;
+      }
+
+     .modal-content {
+        background-color: #fefefe;
+        padding: 20px;
+        border-radius: 10px;
+        width: 300px;
+        text-align: center;
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: scale(0.8);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+     .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+     .close:hover,
+     .close:focus {
+        color: black;
+        text-decoration: none;
+      }
+
+      img {
+        display: block;
+        margin: 20px auto;
+        border-radius: 10px;
+      }
+    </style>
+</head>
+
+<body>
+    <h1 class="text-4xl font-bold text-center mt-8">井字棋游戏</h1>
+    <div id="board">
+        <!-- 这里会通过 JavaScript 动态创建井字棋的单元格 -->
+    </div>
+    <p id="status" class="text-lg mt-4"></p>
+    <img src="@/https___zxy88888888-zxy.github.io_xiaoyouxi_.png" alt="网站二维码" class="mt-8 w-48">
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p id="modal-message"></p>
+        </div>
+    </div>
+    <script>
+        const board = document.getElementById('board');
+        const status = document.getElementById('status');
+        const modal = document.getElementById('myModal');
+        const modalMessage = document.getElementById('modal-message');
+        const closeBtn = document.querySelector('.close');
+        let currentPlayer = 'X';
+        let gameBoard = ['', '', '', '', '', '', '', '', ''];
+        let gameActive = true;
+
+        function createBoard() {
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.index = i;
+                cell.addEventListener('click', handleCellClick);
+                board.appendChild(cell);
+            }
+        }
+
+        function handleCellClick(event) {
+            const index = parseInt(event.target.dataset.index);
+            if (gameBoard[index] === '' && gameActive) {
+                gameBoard[index] = currentPlayer;
+                event.target.textContent = currentPlayer;
+                event.target.style.color = currentPlayer === 'X'? 'black' : 'white';
+                if (checkWin(currentPlayer)) {
+                    const winMessage = `${currentPlayer} 获胜！`;
+                    console.log('Win message:', winMessage); // 调试信息
+                    showModal(winMessage);
+                    gameActive = false;
+                } else if (gameBoard.every(cell => cell!== '')) {
+                    const drawMessage = '平局！';
+                    console.log('Draw message:', drawMessage); // 调试信息
+                    showModal(drawMessage);
+                    gameActive = false;
+                } else {
+                    currentPlayer = currentPlayer === 'X'? 'O' : 'X';
+                    status.textContent = `${currentPlayer} 的回合`;
+                }
+            }
+        }
+
+        function checkWin(player) {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+            return winPatterns.some(pattern => {
+                return pattern.every(index => gameBoard[index] === player);
+            });
+        }
+
+        function showModal(message) {
+            console.log('Showing modal with message:', message); // 调试信息
+            modalMessage.textContent = message;
+            modal.style.display = 'flex';
+        }
+
+        closeBtn.addEventListener('click', function () {
+            modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', function (event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        createBoard();
+        status.textContent = `${currentPlayer} 的回合`;
+    </script>
+</body>
+
 </html>
+    
